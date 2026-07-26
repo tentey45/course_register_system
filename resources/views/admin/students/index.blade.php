@@ -13,7 +13,7 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h4 class="fw-bold mb-1">Student Directory</h4>
-        <p class="text-muted small mb-0">List of registered university student accounts</p>
+        <p class="text-muted small mb-0">List of registered university student accounts in database</p>
     </div>
 </div>
 
@@ -31,30 +31,16 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td class="ps-4 fw-bold">00124875</td>
-                    <td class="fw-semibold">John Doe</td>
-                    <td>student@scrs.edu</td>
-                    <td>Computer Science</td>
-                    <td><span class="badge bg-secondary-subtle text-dark">4 Courses</span></td>
-                    <td class="pe-4 text-end"><span class="badge bg-success-subtle text-success">Active</span></td>
-                </tr>
-                <tr>
-                    <td class="ps-4 fw-bold">00124876</td>
-                    <td class="fw-semibold">Jane Smith</td>
-                    <td>jane.smith@scrs.edu</td>
-                    <td>Computer Science</td>
-                    <td><span class="badge bg-secondary-subtle text-dark">3 Courses</span></td>
-                    <td class="pe-4 text-end"><span class="badge bg-success-subtle text-success">Active</span></td>
-                </tr>
-                <tr>
-                    <td class="ps-4 fw-bold">00124877</td>
-                    <td class="fw-semibold">Michael Johnson</td>
-                    <td>michael.j@scrs.edu</td>
-                    <td>Information Technology</td>
-                    <td><span class="badge bg-secondary-subtle text-dark">5 Courses</span></td>
-                    <td class="pe-4 text-end"><span class="badge bg-success-subtle text-success">Active</span></td>
-                </tr>
+                @foreach($students as $student)
+                    <tr>
+                        <td class="ps-4 fw-bold text-primary">{{ $student->student_id }}</td>
+                        <td class="fw-semibold">{{ $student->name }}</td>
+                        <td>{{ $student->email }}</td>
+                        <td>{{ $student->department->name ?? 'Computer Science' }}</td>
+                        <td><span class="badge bg-secondary-subtle text-dark">{{ $student->registrations_count }} Courses</span></td>
+                        <td class="pe-4 text-end"><span class="badge bg-success-subtle text-success">Active</span></td>
+                    </tr>
+                @endforeach
             </tbody>
         </table>
     </div>

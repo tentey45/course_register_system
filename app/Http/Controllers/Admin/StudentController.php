@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Student;
 use Illuminate\View\View;
 
 class StudentController extends Controller
 {
     public function index(): View
     {
-        return view('admin.students.index');
+        $students = Student::with('department')->withCount('registrations')->get();
+        return view('admin.students.index', compact('students'));
     }
 }

@@ -26,7 +26,7 @@
                 </div>
                 <div>
                     <span class="text-muted extra-small d-block">Total Courses</span>
-                    <h4 class="fw-bold mb-0">12</h4>
+                    <h4 class="fw-bold mb-0">{{ $coursesCount }}</h4>
                 </div>
             </div>
         </div>
@@ -40,7 +40,7 @@
                 </div>
                 <div>
                     <span class="text-muted extra-small d-block">Enrolled Students</span>
-                    <h4 class="fw-bold mb-0">148</h4>
+                    <h4 class="fw-bold mb-0">{{ $studentsCount }}</h4>
                 </div>
             </div>
         </div>
@@ -54,7 +54,7 @@
                 </div>
                 <div>
                     <span class="text-muted extra-small d-block">Total Registrations</span>
-                    <h4 class="fw-bold mb-0">520</h4>
+                    <h4 class="fw-bold mb-0">{{ $registrationsCount }}</h4>
                 </div>
             </div>
         </div>
@@ -68,7 +68,7 @@
                 </div>
                 <div>
                     <span class="text-muted extra-small d-block">Departments</span>
-                    <h4 class="fw-bold mb-0">4</h4>
+                    <h4 class="fw-bold mb-0">{{ $departmentsCount }}</h4>
                 </div>
             </div>
         </div>
@@ -82,10 +82,10 @@
             <div>
                 <i class="bi bi-journal-album fs-1 text-primary mb-2"></i>
                 <h5 class="fw-bold mb-2">Manage Courses</h5>
-                <p class="text-muted small">View, add, edit, or disable available university courses and schedules.</p>
+                <p class="text-muted small">View catalog of available university courses, department assignments, and credit values.</p>
             </div>
             <a href="{{ route('admin.courses.index') }}" class="btn btn-primary rounded-3 text-white fw-semibold w-100 mt-3" style="background-color: var(--wf-blue); border: none;">
-                Open Course Manager <i class="bi bi-arrow-right ms-1"></i>
+                Open Course Manager ({{ $coursesCount }}) <i class="bi bi-arrow-right ms-1"></i>
             </a>
         </div>
     </div>
@@ -98,7 +98,7 @@
                 <p class="text-muted small">Browse all registered student accounts, departments, and enrollment status.</p>
             </div>
             <a href="{{ route('admin.students.index') }}" class="btn btn-outline-dark rounded-3 fw-semibold w-100 mt-3">
-                Open Student List <i class="bi bi-arrow-right ms-1"></i>
+                Open Student List ({{ $studentsCount }}) <i class="bi bi-arrow-right ms-1"></i>
             </a>
         </div>
     </div>
@@ -111,7 +111,7 @@
                 <p class="text-muted small">Monitor real-time course registrations and enrollment records across all departments.</p>
             </div>
             <a href="{{ route('admin.registrations.index') }}" class="btn btn-outline-dark rounded-3 fw-semibold w-100 mt-3">
-                Open Registrations <i class="bi bi-arrow-right ms-1"></i>
+                Open Registrations ({{ $registrationsCount }}) <i class="bi bi-arrow-right ms-1"></i>
             </a>
         </div>
     </div>
