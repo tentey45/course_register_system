@@ -1,13 +1,14 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Authentication Routes Placeholder
+| Authentication Routes
 |--------------------------------------------------------------------------
-|
-| Authentication routes will be registered here.
-| Initial setup phase - no authentication logic implemented yet.
-|
 */
+
+Route::middleware(\App\Http\Middleware\AuthenticateSession::class)->group(function () {
+    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+});
