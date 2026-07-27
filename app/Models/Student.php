@@ -19,6 +19,8 @@ class Student extends Model
         'password',
         'department_id',
         'gender',
+        'google_id',
+        'avatar',
     ];
 
     protected $hidden = ['password'];
@@ -31,6 +33,11 @@ class Student extends Model
     public function registrations(): HasMany
     {
         return $this->hasMany(Registration::class);
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
     }
 
     public function courses(): BelongsToMany

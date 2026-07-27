@@ -20,6 +20,7 @@ class Course extends Model
         'department_id',
         'semester_id',
         'capacity',
+        'price',
     ];
 
     public function department(): BelongsTo

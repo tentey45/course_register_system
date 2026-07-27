@@ -48,6 +48,9 @@
                     <i class="bi bi-box-arrow-in-right me-2"></i> Sign In
                 </button>
             </form>
+		<a href="{{ route('auth.google') }}" class="btn btn-outline-dark w-100 py-3 rounded-3 fw-semibold mb-3 d-flex align-items-center justify-content-center gap-2">
+    <img src="https://www.google.com/favicon.ico" width="18" height="18" alt=""> Sign in with Google
+</a>
 
             <hr class="my-3 text-muted" style="opacity: 0.15;">
 

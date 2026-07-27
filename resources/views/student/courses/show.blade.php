@@ -66,19 +66,15 @@
 
             <hr class="my-4 text-muted" style="opacity: 0.15;">
 
-            @if($isRegistered)
-                <button type="button" class="btn btn-secondary py-3 w-100 rounded-3 fw-semibold" disabled>
-                    <i class="bi bi-check2-circle me-2"></i> You Are Already Registered For This Course
-                </button>
-            @else
-                <!-- RESTful Register Form Submission: POST /student/courses/{course}/register -->
-                <form action="{{ route('student.courses.register', $course->course_code) }}" method="POST">
-                    @csrf
-                    <button type="submit" class="wf-btn-submit py-3">
-                        <i class="bi bi-check-circle me-2"></i> Register for {{ $course->course_code }}
-                    </button>
-                </form>
-            @endif
+@if($isRegistered)
+    <button type="button" class="btn btn-secondary py-3 w-100 rounded-3 fw-semibold" disabled>
+        <i class="bi bi-check2-circle me-2"></i> You Are Already Registered For This Course
+    </button>
+@else
+    <a href="{{ route('student.payment.checkout', $course->course_code) }}" class="wf-btn-submit py-3 d-block text-center text-decoration-none">
+        <i class="bi bi-credit-card me-2"></i> Register &amp; Pay for {{ $course->course_code }} (${{ number_format($course->price, 2) }})
+    </a>
+@endif
         </div>
     </div>
 </div>
