@@ -37,18 +37,21 @@ class CourseController extends Controller
 
         $studentId = $request->session()->get('user_id', 1);
 
-        $isRegistered = Registration::where('student_id', $studentId)
+        $registration = Registration::where('student_id', $studentId)
             ->where('course_id', $courseModel->id)
-            ->where('status', 'registered')
-            ->exists();
+            ->first();
+
+        $isRegistered = $registration && $registration->status === Registration::STATUS_REGISTERED;
+        $isPendingPayment = $registration && $registration->status === Registration::STATUS_PENDING_PAYMENT;
 
         $registeredCount = Registration::where('course_id', $courseModel->id)
-            ->where('status', 'registered')
+            ->where('status', Registration::STATUS_REGISTERED)
             ->count();
 
         return view('student.courses.show', [
             'course' => $courseModel,
             'isRegistered' => $isRegistered,
+            'isPendingPayment' => $isPendingPayment,
             'registeredCount' => $registeredCount,
         ]);
     }

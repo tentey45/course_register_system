@@ -35,6 +35,7 @@
                     <th class="py-3">Credits</th>
                     <th class="py-3">Capacity</th>
                     <th class="py-3">Price</th>
+                    <th class="py-3">Payment Link</th>
                     <th class="py-3">Semester</th>
                     <th class="pe-4 text-end py-3">Actions</th>
                 </tr>
@@ -48,6 +49,15 @@
                         <td>{{ $course->credits }}.0</td>
                         <td>{{ $course->capacity }} Seats</td>
                         <td>${{ number_format($course->price, 2) }}</td>
+                        <td>
+                            @if($course->payment_link)
+                                <a href="{{ $course->payment_link }}" target="_blank" class="badge bg-success-subtle text-success text-decoration-none" title="{{ $course->payment_link }}">
+                                    <i class="bi bi-link-45deg me-1"></i> Configured
+                                </a>
+                            @else
+                                <span class="badge bg-warning-subtle text-dark"><i class="bi bi-exclamation-circle me-1"></i> Missing</span>
+                            @endif
+                        </td>
                         <td><span class="badge bg-secondary-subtle text-dark">{{ $course->semester->name ?? 'Semester 1' }}</span></td>
                         <td class="pe-4 text-end">
                             <a href="{{ route('admin.courses.edit', $course->id) }}" class="btn btn-sm btn-light rounded-2 me-1">

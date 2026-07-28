@@ -19,11 +19,25 @@
             </div>
         @endif
 
+        @if(session('success'))
+            <div class="alert alert-success border-0 shadow-sm rounded-3 mb-3 small">
+                <i class="bi bi-check-circle me-2"></i> {{ session('success') }}
+            </div>
+        @endif
+
+        @if(session('info'))
+            <div class="alert alert-info border-0 shadow-sm rounded-3 mb-3 small">
+                <i class="bi bi-info-circle me-2"></i> {{ session('info') }}
+            </div>
+        @endif
+
         <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white mb-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-2 fs-6">{{ $course->course_code }}</span>
                 @if($isRegistered)
                     <span class="badge bg-success text-white fw-semibold px-3 py-2"><i class="bi bi-check-circle me-1"></i> Registered</span>
+                @elseif($isPendingPayment)
+                    <span class="badge bg-warning text-dark fw-semibold px-3 py-2"><i class="bi bi-clock me-1"></i> Pending Payment</span>
                 @else
                     <span class="badge bg-success-subtle text-success fw-semibold px-3 py-2">Open for Registration</span>
                 @endif
@@ -70,8 +84,30 @@
     <button type="button" class="btn btn-secondary py-3 w-100 rounded-3 fw-semibold" disabled>
         <i class="bi bi-check2-circle me-2"></i> You Are Already Registered For This Course
     </button>
+@elseif($isPendingPayment)
+    <div class="d-grid gap-2">
+        <a href="{{ route('student.payment.pay', $course->course_code) }}" class="btn btn-warning py-3 d-block text-center text-decoration-none fw-bold shadow-sm rounded-3">
+            <i class="bi bi-arrow-repeat me-2"></i> Complete Pending Payment (${{ number_format($course->price, 2) }})
+        </a>
+        <div class="d-flex gap-2">
+            <form action="{{ route('student.payment.check', $course->course_code) }}" method="POST" class="flex-grow-1">
+                @csrf
+                <input type="hidden" name="simulate_success" value="1">
+                <button type="submit" class="btn btn-outline-success py-2 w-100 rounded-3 fw-semibold">
+                    <i class="bi bi-patch-check me-1"></i> Verify &amp; Confirm Paid (Demo)
+                </button>
+            </form>
+            <form action="{{ route('student.payment.cancel', $course->course_code) }}" method="POST"
+                  onsubmit="return confirm('Cancel your pending registration for {{ $course->course_code }}? You can register again later.')"> 
+                @csrf
+                <button type="submit" class="btn btn-outline-danger py-2 rounded-3 fw-semibold px-3">
+                    <i class="bi bi-x-circle me-1"></i> Cancel
+                </button>
+            </form>
+        </div>
+    </div>
 @else
-    <a href="{{ route('student.payment.checkout', $course->course_code) }}" class="wf-btn-submit py-3 d-block text-center text-decoration-none">
+    <a href="{{ route('student.payment.pay', $course->course_code) }}" class="wf-btn-submit py-3 d-block text-center text-decoration-none">
         <i class="bi bi-credit-card me-2"></i> Register &amp; Pay for {{ $course->course_code }} (${{ number_format($course->price, 2) }})
     </a>
 @endif

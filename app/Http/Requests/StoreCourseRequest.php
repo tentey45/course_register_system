@@ -22,6 +22,7 @@ class StoreCourseRequest extends FormRequest
             'semester_id' => ['required', 'exists:semesters,id'],
             'capacity' => ['required', 'integer', 'min:1', 'max:500'],
             'price' => ['required', 'numeric', 'min:0', 'max:9999.99'],
+            'payment_link' => ['nullable', 'url', 'max:500'],
         ];
     }
 }

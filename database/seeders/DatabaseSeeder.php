@@ -67,6 +67,8 @@ class DatabaseSeeder extends Seeder
             'department_id' => $csDept->id,
             'semester_id' => $semester->id,
             'capacity' => 40,
+            'price' => 100.00,
+            'payment_link' => 'https://link-sandbox.payway.com.kh/Dz80706N',
         ]);
 
         $c2 = Course::create([

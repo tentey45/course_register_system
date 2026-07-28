@@ -237,6 +237,11 @@
                                 <i class="bi bi-journal-check me-1"></i> View Registrations
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->is('admin/payments*') ? 'active' : '' }}" href="{{ route('admin.payments.index') }}">
+                                <i class="bi bi-credit-card me-1"></i> View Payments
+                            </a>
+                        </li>
                     @else
                         <!-- Student Navigation -->
                         <li class="nav-item">

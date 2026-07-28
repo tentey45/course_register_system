@@ -10,34 +10,49 @@ class Payment extends Model
 {
     use HasFactory;
 
-    public const STATUS_PENDING = 'pending';
-    public const STATUS_PAID = 'paid';
-    public const STATUS_FAILED = 'failed';
+    // Status constants
+    public const STATUS_PENDING   = 'pending';
+    public const STATUS_PAID      = 'paid';
+    public const STATUS_FAILED    = 'failed';
     public const STATUS_CANCELLED = 'cancelled';
 
-    public const METHOD_ABA = 'aba_payway';
-    public const METHOD_BAKONG = 'bakong';
+    // Payment method label
+    public const METHOD_ABA = 'ABA PayWay';
 
     protected $fillable = [
+        'registration_id',
         'student_id',
         'course_id',
-        'method',
+        'transaction_id',   // ABA's tran_id — filled after callback
         'amount',
         'currency',
-        'transaction_id',
-        'status',
-        'qr_string',
-        'gateway_response',
+        'payment_method',   // 'ABA PayWay'
+        'status',           // pending | paid | failed | cancelled
+        'payment_response', // raw ABA callback JSON
         'paid_at',
+        // Legacy columns kept for backwards compatibility:
+        'method',
+        'gateway_response',
+        'qr_string',
     ];
 
     protected function casts(): array
     {
         return [
+            'payment_response' => 'array',
             'gateway_response' => 'array',
-            'paid_at' => 'datetime',
-            'amount' => 'decimal:2',
+            'paid_at'          => 'datetime',
+            'amount'           => 'decimal:2',
         ];
+    }
+
+    // -------------------------------------------------------------------------
+    // Relationships
+    // -------------------------------------------------------------------------
+
+    public function registration(): BelongsTo
+    {
+        return $this->belongsTo(Registration::class);
     }
 
     public function student(): BelongsTo
@@ -50,42 +65,52 @@ class Payment extends Model
         return $this->belongsTo(Course::class);
     }
 
+    // -------------------------------------------------------------------------
+    // Helpers
+    // -------------------------------------------------------------------------
+
     public function isPaid(): bool
     {
         return $this->status === self::STATUS_PAID;
     }
 
     /**
-     * Mark this payment as paid and create the actual course Registration.
-     * Safe to call more than once (idempotent) — the unique(student_id, course_id)
-     * index on `registrations` prevents duplicates.
+     * Mark the payment as paid and update its linked registration to 'registered'.
+     * Safe to call more than once (idempotent).
+     *
+     * @param  string      $tranId   ABA's transaction ID
+     * @param  array       $response Raw ABA callback/check-transaction response
      */
-    public function markPaid(array $gatewayResponse = []): Registration
+    public function markPaid(string $tranId, array $response = []): void
     {
         if (!$this->isPaid()) {
             $this->update([
-                'status' => self::STATUS_PAID,
-                'gateway_response' => $gatewayResponse ?: $this->gateway_response,
-                'paid_at' => now(),
+                'status'           => self::STATUS_PAID,
+                'transaction_id'   => $tranId,
+                'payment_response' => $response,
+                'paid_at'          => now(),
             ]);
         }
 
-        $existing = Registration::where('student_id', $this->student_id)
-            ->where('course_id', $this->course_id)
-            ->first();
-
-        if ($existing) {
-            if ($existing->status !== 'registered') {
-                $existing->update(['status' => 'registered', 'registered_at' => now()]);
-            }
-            return $existing;
+        // Update the linked registration.
+        if ($this->registration) {
+            $this->registration->update([
+                'status'        => Registration::STATUS_REGISTERED,
+                'registered_at' => $this->paid_at ?? now(),
+            ]);
         }
+    }
 
-        return Registration::create([
-            'student_id' => $this->student_id,
-            'course_id' => $this->course_id,
-            'registered_at' => now(),
-            'status' => 'registered',
+    /**
+     * Mark the payment as failed, leaving the registration in pending_payment
+     * so the student can retry.
+     */
+    public function markFailed(array $response = []): void
+    {
+        $this->update([
+            'status'           => self::STATUS_FAILED,
+            'payment_response' => $response,
         ]);
+        // Registration intentionally left as pending_payment — student can try again.
     }
 }

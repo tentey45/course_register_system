@@ -35,6 +35,18 @@ Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->
 Route::get('/register/complete', [GoogleAuthController::class, 'showCompleteForm'])->name('register.complete');
 Route::post('/register/complete', [GoogleAuthController::class, 'storeCompleteForm'])->name('register.complete.store');
 
+/*
+|--------------------------------------------------------------------------
+| ABA PayWay Return URL (CSRF exempt — ABA POSTs from their servers)
+|--------------------------------------------------------------------------
+| Must be outside the auth middleware group so ABA's server-side callback
+| can reach it without a Laravel session cookie.
+| The browser GET redirect also lands here.
+*/
+Route::match(['get', 'post'], '/student/payment/return', [Student\PaymentController::class, 'handleReturn'])
+    ->name('payment.return')
+    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+
 // Authenticated Session Protected Routes
 Route::middleware([AuthenticateSession::class])->group(function () {
 
@@ -47,31 +59,32 @@ Route::middleware([AuthenticateSession::class])->group(function () {
         Route::get('/courses/{course}', [Student\CourseController::class, 'show'])->name('courses.show');
         Route::get('/profile', [Student\ProfileController::class, 'index'])->name('profile');
 
-        // Checkout / payment flow (replaces the old direct "register" POST)
-        Route::get('/courses/{course}/checkout', [Student\PaymentController::class, 'checkout'])->name('payment.checkout');
-        Route::post('/courses/{course}/checkout', [Student\PaymentController::class, 'start'])->name('payment.start');
-        Route::get('/payment/{payment}/aba', [Student\PaymentController::class, 'aba'])->name('payment.aba');
-        Route::get('/payment/aba/return', [Student\PaymentController::class, 'abaReturn'])->name('payment.aba.return');
-        Route::get('/payment/{payment}/bakong', [Student\PaymentController::class, 'bakong'])->name('payment.bakong');
-        Route::get('/payment/{payment}/bakong/poll', [Student\PaymentController::class, 'pollBakong'])->name('payment.bakong.poll');
-        Route::get('/payment/{payment}/status', [Student\PaymentController::class, 'status'])->name('payment.status');
-        Route::post('/payment/{payment}/cancel', [Student\PaymentController::class, 'cancelled'])->name('payment.cancelled');
+        // Payment flow (ABA PayWay Payment Link)
+        Route::get('/courses/{course}/pay',  [Student\PaymentController::class, 'pay'])->name('payment.pay');
+        Route::post('/courses/{course}/pay', [Student\PaymentController::class, 'processPay'])->name('payment.process');
+        Route::post('/courses/{course}/pay/cancel', [Student\PaymentController::class, 'cancelPayment'])->name('payment.cancel');
+        Route::post('/courses/{course}/pay/check', [Student\PaymentController::class, 'checkStatus'])->name('payment.check');
+        Route::get('/payment/{payment}/success', [Student\PaymentController::class, 'success'])->name('payment.success');
+        Route::get('/payment/{payment}/failed',  [Student\PaymentController::class, 'failed'])->name('payment.failed');
     });
 
     // Admin Role Routes
-  Route::middleware([AdminMiddleware::class])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', [Admin\DashboardController::class, 'index'])->name('dashboard');
+    Route::middleware([AdminMiddleware::class])->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/dashboard', [Admin\DashboardController::class, 'index'])->name('dashboard');
 
-    Route::get('/courses', [Admin\CourseController::class, 'index'])->name('courses.index');
-    Route::get('/courses/create', [Admin\CourseController::class, 'create'])->name('courses.create');
-    Route::post('/courses', [Admin\CourseController::class, 'store'])->name('courses.store');
-    Route::get('/courses/{course}/edit', [Admin\CourseController::class, 'edit'])->name('courses.edit');
-    Route::put('/courses/{course}', [Admin\CourseController::class, 'update'])->name('courses.update');
-    Route::delete('/courses/{course}', [Admin\CourseController::class, 'destroy'])->name('courses.destroy');
+        Route::get('/courses', [Admin\CourseController::class, 'index'])->name('courses.index');
+        Route::get('/courses/create', [Admin\CourseController::class, 'create'])->name('courses.create');
+        Route::post('/courses', [Admin\CourseController::class, 'store'])->name('courses.store');
+        Route::get('/courses/{course}/edit', [Admin\CourseController::class, 'edit'])->name('courses.edit');
+        Route::put('/courses/{course}', [Admin\CourseController::class, 'update'])->name('courses.update');
+        Route::delete('/courses/{course}', [Admin\CourseController::class, 'destroy'])->name('courses.destroy');
 
-    Route::get('/students', [Admin\StudentController::class, 'index'])->name('students.index');
-    Route::get('/registrations', [Admin\RegistrationController::class, 'index'])->name('registrations.index');
-});
+        Route::get('/students', [Admin\StudentController::class, 'index'])->name('students.index');
+        Route::get('/registrations', [Admin\RegistrationController::class, 'index'])->name('registrations.index');
+
+        // Payment monitoring (Refinement 5)
+        Route::get('/payments', [Admin\PaymentController::class, 'index'])->name('payments.index');
+    });
 
 });
 

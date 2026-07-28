@@ -21,6 +21,7 @@ class Course extends Model
         'semester_id',
         'capacity',
         'price',
+        'payment_link',
     ];
 
     public function department(): BelongsTo
@@ -41,6 +42,11 @@ class Course extends Model
     public function registrations(): HasMany
     {
         return $this->hasMany(Registration::class);
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
     }
 
     public function students(): BelongsToMany

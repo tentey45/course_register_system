@@ -42,19 +42,24 @@
 </div>
 
 <div class="row g-3 mb-4">
-    <div class="col-md-4">
+    <div class="col-md-3">
         <label class="form-label fw-semibold small">Credits</label>
         <input type="number" name="credits" class="form-control bg-light border-0" min="1" max="10"
                value="{{ old('credits', $course->credits ?? 3) }}" required>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         <label class="form-label fw-semibold small">Capacity</label>
         <input type="number" name="capacity" class="form-control bg-light border-0" min="1" max="500"
                value="{{ old('capacity', $course->capacity ?? 40) }}" required>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         <label class="form-label fw-semibold small">Price (USD)</label>
         <input type="number" step="0.01" name="price" class="form-control bg-light border-0" min="0" max="9999.99"
                value="{{ old('price', $course->price ?? 50) }}" required>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label fw-semibold small">ABA Payment Link</label>
+        <input type="url" name="payment_link" class="form-control bg-light border-0" placeholder="https://link-sandbox.payway.com.kh/..."
+               value="{{ old('payment_link', $course->payment_link ?? '') }}">
     </div>
 </div>
