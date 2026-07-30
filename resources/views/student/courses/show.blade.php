@@ -80,23 +80,25 @@
 
             <hr class="my-4 text-muted" style="opacity: 0.15;">
 
-@if($isRegistered)
-    <button type="button" class="btn btn-secondary py-3 w-100 rounded-3 fw-semibold" disabled>
-        <i class="bi bi-check2-circle me-2"></i> You Are Already Registered For This Course
-    </button>
-@elseif($isPendingPayment)
+        @if($isRegistered)
+            <div class="d-grid gap-2">
+                <form action="{{ route('student.courses.drop', $course->course_code) }}" method="POST" class="mt-2">
+                    @csrf
+                    <div class="mb-2">
+                        <label for="reason" class="form-label fw-semibold">Reason for dropping</label>
+                        <textarea name="reason" id="reason" class="form-control" rows="2" placeholder="Enter reason..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-outline-danger py-2 rounded-3 fw-semibold">
+                        <i class="bi bi-x-circle me-1"></i> Drop Course
+                    </button>
+                </form>
+            </div>
+        @elseif($isPendingPayment)
     <div class="d-grid gap-2">
         <a href="{{ route('student.payment.pay', $course->course_code) }}" class="btn btn-warning py-3 d-block text-center text-decoration-none fw-bold shadow-sm rounded-3">
             <i class="bi bi-arrow-repeat me-2"></i> Complete Pending Payment (${{ number_format($course->price, 2) }})
         </a>
         <div class="d-flex gap-2">
-            <form action="{{ route('student.payment.check', $course->course_code) }}" method="POST" class="flex-grow-1">
-                @csrf
-                <input type="hidden" name="simulate_success" value="1">
-                <button type="submit" class="btn btn-outline-success py-2 w-100 rounded-3 fw-semibold">
-                    <i class="bi bi-patch-check me-1"></i> Verify &amp; Confirm Paid (Demo)
-                </button>
-            </form>
             <form action="{{ route('student.payment.cancel', $course->course_code) }}" method="POST"
                   onsubmit="return confirm('Cancel your pending registration for {{ $course->course_code }}? You can register again later.')"> 
                 @csrf

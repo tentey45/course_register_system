@@ -13,7 +13,7 @@ return new class extends Migration {
             ->where('course_code', 'CS201')
             ->update([
                 'price' => 100.00,
-                'payment_link' => 'https://link-sandbox.payway.com.kh/OR80707g',
+                'payment_link' => 'https://link-sandbox.payway.com.kh/NR80723K',
             ]);
     }
 

@@ -39,7 +39,7 @@
                 </div>
             </div>
 
-            <form action="{{ route('student.payment.start', $course->course_code) }}" method="POST">
+            <form action="{{ route('student.payment.process', $course->course_code) }}" method="POST">
                 @csrf
                 <label class="form-label fw-semibold small mb-2">Choose a payment method</label>
 
@@ -49,13 +49,6 @@
                         <div>
                             <div class="fw-semibold">ABA PayWay</div>
                             <div class="text-muted extra-small" style="font-size:0.75rem;">Pay with ABA Pay, KHQR, or card via ABA's checkout</div>
-                        </div>
-                    </label>
-                    <label class="border rounded-3 p-3 d-flex align-items-center gap-3" style="cursor:pointer;">
-                        <input type="radio" name="method" value="bakong" class="form-check-input mt-0" required>
-                        <div>
-                            <div class="fw-semibold">Bakong KHQR</div>
-                            <div class="text-muted extra-small" style="font-size:0.75rem;">Scan a QR code with any Bakong-linked banking app</div>
                         </div>
                     </label>
                 </div>

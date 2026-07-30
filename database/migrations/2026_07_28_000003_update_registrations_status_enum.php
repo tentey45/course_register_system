@@ -16,6 +16,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // SQLite stores enum columns as text and does not support MODIFY COLUMN.
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
         DB::statement("
             ALTER TABLE registrations
             MODIFY COLUMN status
@@ -26,6 +31,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
         DB::statement("
             ALTER TABLE registrations
             MODIFY COLUMN status

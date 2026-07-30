@@ -7,6 +7,8 @@ use App\Http\Requests\RegisterCourseRequest;
 use App\Models\Course;
 use App\Models\CourseSchedule;
 use App\Models\Registration;
+use App\Models\Payment;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -23,7 +25,7 @@ class CourseController extends Controller
                       ->orWhere('title', 'LIKE', "%{$search}%")
                       ->orWhere('description', 'LIKE', "%{$search}%");
             })
-            ->get();
+            ->paginate(10);
 
         return view('student.courses.index', compact('courses', 'search'));
     }
@@ -35,7 +37,7 @@ class CourseController extends Controller
             ->with(['department', 'semester', 'schedules'])
             ->firstOrFail();
 
-        $studentId = $request->session()->get('user_id', 1);
+        $studentId = $request->session()->get('user_id');
 
         $registration = Registration::where('student_id', $studentId)
             ->where('course_id', $courseModel->id)
@@ -56,9 +58,52 @@ class CourseController extends Controller
         ]);
     }
 
+    /**
+     * Drop a registered course.
+     */
+    public function drop(Request $request, string $course): \Illuminate\Http\RedirectResponse
+    {
+        $request->validate(['reason' => 'required|string|max:500']);
+
+        $studentId = $request->session()->get('user_id');
+
+        $courseModel = Course::where('course_code', $course)
+            ->orWhere('id', $course)
+            ->firstOrFail();
+
+        $registration = Registration::where('student_id', $studentId)
+            ->where('course_id', $courseModel->id)
+            ->first();
+
+        if (!$registration || $registration->status !== Registration::STATUS_REGISTERED) {
+            return redirect()->route('student.courses.show', $courseModel->course_code)
+                ->with('error', 'You are not currently registered for this course.');
+        }
+
+        // Cancel any pending payment linked to this registration
+        if ($registration->payment && $registration->payment->status === Payment::STATUS_PENDING) {
+            $registration->payment->update(['status' => Payment::STATUS_CANCELLED]);
+        }
+
+        $registration->update([
+            'status' => Registration::STATUS_CANCELLED,
+            'drop_reason' => $request->input('reason'),
+        ]);
+
+        Log::info('Student dropped course', [
+            'student_id' => $studentId,
+            'course_code' => $courseModel->course_code,
+            'registration_id' => $registration->id,
+            'reason' => $request->input('reason'),
+        ]);
+
+        return redirect()->route('student.courses.my-courses')
+            ->with('success', "Course {$courseModel->course_code} has been dropped.");
+    }
+
     public function register(RegisterCourseRequest $request, string $course): RedirectResponse
     {
-        $studentId = $request->session()->get('user_id', 1);
+        $studentId = $request->session()->get('user_id');
 
         $courseModel = Course::where('course_code', $course)
             ->orWhere('id', $course)
@@ -89,7 +134,7 @@ class CourseController extends Controller
 
     public function myCourses(Request $request): View
     {
-        $studentId = $request->session()->get('user_id', 1);
+        $studentId = $request->session()->get('user_id');
 
         $registrations = Registration::where('student_id', $studentId)
             ->where('status', 'registered')
@@ -101,7 +146,7 @@ class CourseController extends Controller
 
     public function schedule(Request $request): View
     {
-        $studentId = $request->session()->get('user_id', 1);
+        $studentId = $request->session()->get('user_id');
 
         $courseIds = Registration::where('student_id', $studentId)
             ->where('status', 'registered')

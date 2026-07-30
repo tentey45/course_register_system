@@ -218,6 +218,12 @@
                     @if(session('role') === 'admin')
                         <!-- Admin Navigation -->
                         <li class="nav-item">
+                            <a class="nav-link {{ request()->is('admin/departments*') ? 'active' : '' }}" href="{{ route('admin.departments.index') }}"><i class="bi bi-diagram-3 me-1"></i> Departments</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->is('admin/semesters*') ? 'active' : '' }}" href="{{ route('admin.semesters.index') }}"><i class="bi bi-calendar-range me-1"></i> Semesters</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {{ request()->is('admin/dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">
                                 <i class="bi bi-speedometer2 me-1"></i> Dashboard
                             </a>

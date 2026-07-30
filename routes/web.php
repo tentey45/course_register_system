@@ -8,6 +8,7 @@ use App\Http\Middleware\AuthenticateSession;
 use App\Http\Middleware\StudentMiddleware;
 use App\Http\Middleware\AdminMiddleware;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,9 +20,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return redirect()->route('login');
 })->name('home');
-Route::get('/debug-google', function () {
-    dd(config('services.google'));
-});
 
 // Guest Authentication Routes
 Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
@@ -64,13 +62,30 @@ Route::middleware([AuthenticateSession::class])->group(function () {
         Route::post('/courses/{course}/pay', [Student\PaymentController::class, 'processPay'])->name('payment.process');
         Route::post('/courses/{course}/pay/cancel', [Student\PaymentController::class, 'cancelPayment'])->name('payment.cancel');
         Route::post('/courses/{course}/pay/check', [Student\PaymentController::class, 'checkStatus'])->name('payment.check');
+        Route::get('/payment/checkout/{registration}',[PaymentController::class,'checkout'])->name('student.payment.checkout');
+        Route::post('/payment/callback', [PaymentController::class, 'callback'])->name('payment.callback');
+
+        // Drop a registered course (student)
+        Route::post('/courses/{course}/drop', [Student\CourseController::class, 'drop'])->name('courses.drop');
         Route::get('/payment/{payment}/success', [Student\PaymentController::class, 'success'])->name('payment.success');
         Route::get('/payment/{payment}/failed',  [Student\PaymentController::class, 'failed'])->name('payment.failed');
+        Route::get('/payment/{payment}/pending', [Student\PaymentController::class, 'pending'])->name('payment.pending');
     });
 
     // Admin Role Routes
     Route::middleware([AdminMiddleware::class])->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [Admin\DashboardController::class, 'index'])->name('dashboard');
+
+        Route::get('/departments', [Admin\DepartmentController::class, 'index'])->name('departments.index');
+        Route::get('/departments/create', [Admin\DepartmentController::class, 'create'])->name('departments.create');
+        Route::post('/departments', [Admin\DepartmentController::class, 'store'])->name('departments.store');
+        Route::get('/departments/{department}/edit', [Admin\DepartmentController::class, 'edit'])->name('departments.edit');
+        Route::put('/departments/{department}', [Admin\DepartmentController::class, 'update'])->name('departments.update');
+        Route::get('/semesters', [Admin\SemesterController::class, 'index'])->name('semesters.index');
+        Route::get('/semesters/create', [Admin\SemesterController::class, 'create'])->name('semesters.create');
+        Route::post('/semesters', [Admin\SemesterController::class, 'store'])->name('semesters.store');
+        Route::get('/semesters/{semester}/edit', [Admin\SemesterController::class, 'edit'])->name('semesters.edit');
+        Route::put('/semesters/{semester}', [Admin\SemesterController::class, 'update'])->name('semesters.update');
 
         Route::get('/courses', [Admin\CourseController::class, 'index'])->name('courses.index');
         Route::get('/courses/create', [Admin\CourseController::class, 'create'])->name('courses.create');
@@ -80,10 +95,19 @@ Route::middleware([AuthenticateSession::class])->group(function () {
         Route::delete('/courses/{course}', [Admin\CourseController::class, 'destroy'])->name('courses.destroy');
 
         Route::get('/students', [Admin\StudentController::class, 'index'])->name('students.index');
+        Route::get('/students/create', [Admin\StudentController::class, 'create'])->name('students.create');
+        Route::post('/students', [Admin\StudentController::class, 'store'])->name('students.store');
+        Route::get('/students/{student}', [Admin\StudentController::class, 'show'])->name('students.show');
+        Route::get('/students/{student}/edit', [Admin\StudentController::class, 'edit'])->name('students.edit');
+        Route::put('/students/{student}', [Admin\StudentController::class, 'update'])->name('students.update');
+        Route::post('/students/{student}/deactivate', [Admin\StudentController::class, 'deactivate'])->name('students.deactivate');
+        Route::post('/students/{student}/activate', [Admin\StudentController::class, 'activate'])->name('students.activate');
         Route::get('/registrations', [Admin\RegistrationController::class, 'index'])->name('registrations.index');
 
-        // Payment monitoring (Refinement 5)
+        // Payment monitoring & approval
         Route::get('/payments', [Admin\PaymentController::class, 'index'])->name('payments.index');
+        Route::get('/payments/{payment}', [Admin\PaymentController::class, 'show'])->name('payments.show');
+        Route::post('/payments/{payment}/confirm', [Admin\PaymentController::class, 'confirm'])->name('payments.confirm');
     });
 
 });

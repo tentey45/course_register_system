@@ -42,6 +42,11 @@ class AuthenticatedSessionController extends Controller
         }
 
         $student = Student::where('email', $email)->first();
+        if ($student && !$student->is_active) {
+            return back()->withInput($request->only('email'))
+                ->with('error', 'This student account is inactive. Please contact the registrar.');
+        }
+
         if ($student && $student->password && Hash::check($password, $student->password)) {
             $request->session()->put([
                 'authenticated' => true,

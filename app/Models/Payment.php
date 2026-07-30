@@ -13,6 +13,7 @@ class Payment extends Model
     // Status constants
     public const STATUS_PENDING   = 'pending';
     public const STATUS_PAID      = 'paid';
+    public const STATUS_CONFIRMED = 'confirmed';
     public const STATUS_FAILED    = 'failed';
     public const STATUS_CANCELLED = 'cancelled';
 
@@ -74,8 +75,18 @@ class Payment extends Model
         return $this->status === self::STATUS_PAID;
     }
 
+    public function isConfirmed(): bool
+    {
+        return $this->status === self::STATUS_CONFIRMED;
+    }
+
+    public function isGatewayPaid(): bool
+    {
+        return in_array($this->status, [self::STATUS_PAID, self::STATUS_CONFIRMED], true);
+    }
+
     /**
-     * Mark the payment as paid and update its linked registration to 'registered'.
+     * Mark the payment as ABA-verified. The registrar confirms enrollment separately.
      * Safe to call more than once (idempotent).
      *
      * @param  string      $tranId   ABA's transaction ID
@@ -92,7 +103,27 @@ class Payment extends Model
             ]);
         }
 
-        // Update the linked registration.
+    }
+
+    /**
+     * Confirm payment after either ABA verification or an administrator's
+     * reconciliation against the ABA Payment Link merchant portal.
+     */
+    public function confirm(): void
+    {
+        if (in_array($this->status, [self::STATUS_FAILED, self::STATUS_CANCELLED, self::STATUS_CONFIRMED], true)) {
+            return;
+        }
+
+        $this->update([
+            'status' => self::STATUS_CONFIRMED,
+            'paid_at' => $this->paid_at ?? now(),
+            'payment_response' => array_merge($this->payment_response ?? [], [
+                'confirmed_by_admin' => true,
+                'confirmed_at' => now()->toDateTimeString(),
+            ]),
+        ]);
+
         if ($this->registration) {
             $this->registration->update([
                 'status'        => Registration::STATUS_REGISTERED,

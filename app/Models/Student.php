@@ -21,9 +21,19 @@ class Student extends Model
         'gender',
         'google_id',
         'avatar',
+        'is_active',
+        'deactivated_at',
     ];
 
     protected $hidden = ['password'];
+
+    protected function casts(): array
+    {
+        return [
+            'is_active' => 'boolean',
+            'deactivated_at' => 'datetime',
+        ];
+    }
 
     public function department(): BelongsTo
     {

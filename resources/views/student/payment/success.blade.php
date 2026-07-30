@@ -28,10 +28,8 @@
                      style="width:80px;height:80px;background:linear-gradient(135deg,#10A352,#0e8e47);">
                     <i class="bi bi-check-lg text-white" style="font-size:2.2rem;"></i>
                 </div>
-                <h3 class="fw-bold mb-1" style="color:#10A352;">Payment Confirmed!</h3>
-                <p class="text-muted small mb-0">
-                    Your registration is now active. You're all set!
-                </p>
+            <h3 class="fw-bold mb-1" style="color:#10A352;">Registration Confirmed!</h3>
+            <p class="text-muted small mb-0">Your payment was verified and confirmed by the registrar. You are registered for this course.</p>
             </div>
 
             {{-- Course Summary --}}

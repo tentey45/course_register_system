@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Registration extends Model
 {
@@ -21,6 +22,7 @@ class Registration extends Model
         'course_id',
         'registered_at',
         'status',
+        'drop_reason',
     ];
 
     public function student(): BelongsTo
@@ -39,6 +41,11 @@ class Registration extends Model
     public function payment(): HasOne
     {
         return $this->hasOne(Payment::class)->latestOfMany();
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
     }
 
     // -------------------------------------------------------------------------

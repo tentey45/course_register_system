@@ -78,7 +78,8 @@ class AbaPayWayService
             'tran_id'              => $payment->transaction_id,
             'amount'               => $amount,
             'items'                => $items,
-            'shipping'             => '',
+            // ABA Sandbox v3 validates this as a numeric value when using hosted checkout.
+            'shipping'             => '0.00',
             'firstname'            => $payment->student->name,
             'lastname'             => '',
             'email'                => $payment->student->email,
@@ -86,8 +87,8 @@ class AbaPayWayService
             'type'                 => 'purchase',
             'payment_option'       => '',  // '' = student picks on ABA's page
             'return_url'           => $this->returnUrl,
-            'cancel_url'           => route('student.payment.cancelled', $payment->id),
-            'continue_success_url' => route('student.payment.status', $payment->id),
+            'cancel_url'           => route('student.payment.pending', $payment->id),
+            'continue_success_url' => route('student.payment.pending', $payment->id),
             'return_deeplink'      => '',
             'currency'             => $payment->currency,
             'custom_fields'        => '',
@@ -155,7 +156,7 @@ class AbaPayWayService
 
         try {
             $response = Http::timeout(15)
-                ->asForm()
+            ->asJson()
                 ->post($this->baseUrl . $this->checkTransactionPath, [
                     'req_time'    => $reqTime,
                     'merchant_id' => $this->merchantId,

@@ -26,8 +26,11 @@
                     <th class="py-3">Student Name</th>
                     <th class="py-3">Course Code</th>
                     <th class="py-3">Course Title</th>
+                    <th class="py-3">Department</th>
+                    <th class="py-3">Semester</th>
                     <th class="py-3">Registered At</th>
                     <th class="pe-4 text-end py-3">Status</th>
+                    <th class="ps-4 py-3">Reason</th>
                 </tr>
             </thead>
             <tbody>
@@ -37,12 +40,30 @@
                         <td class="fw-semibold">{{ $reg->student->name ?? 'Student' }} ({{ $reg->student->student_id ?? '' }})</td>
                         <td><span class="badge bg-primary-subtle text-primary fw-bold">{{ $reg->course->course_code ?? '' }}</span></td>
                         <td>{{ $reg->course->title ?? '' }}</td>
+                        <td>{{ $reg->course?->department?->name ?? '—' }}</td>
+                        <td>{{ $reg->course?->semester?->name ?? '—' }}</td>
                         <td>{{ \Carbon\Carbon::parse($reg->registered_at)->format('M d, Y') }}</td>
-                        <td class="pe-4 text-end"><span class="badge bg-success-subtle text-success">Confirmed</span></td>
+                        <td class="pe-4 text-end">
+                            @if($reg->status === \App\Models\Registration::STATUS_CANCELLED)
+                                <span class="badge bg-danger-subtle text-danger">Cancelled</span>
+                            @elseif($reg->status === \App\Models\Registration::STATUS_PENDING_PAYMENT)
+                                <span class="badge bg-warning-subtle text-dark">Pending</span>
+                            @else
+                                <span class="badge bg-success-subtle text-success">Confirmed</span>
+                            @endif
+                        </td>
+                        <td class="ps-4">
+                            @if($reg->status === \App\Models\Registration::STATUS_CANCELLED)
+                                {{ $reg->drop_reason ?? 'N/A' }}
+                            @else
+                                -
+                            @endif
+                        </td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
     </div>
 </div>
+@if($registrations->hasPages())<div class="mt-3">{{ $registrations->links() }}</div>@endif
 @endsection

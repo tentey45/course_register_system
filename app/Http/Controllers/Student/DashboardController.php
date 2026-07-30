@@ -12,7 +12,7 @@ class DashboardController extends Controller
 {
     public function index(Request $request): View
     {
-        $studentId = $request->session()->get('user_id', 1);
+        $studentId = $request->session()->get('user_id');
 
         $student = Student::with('department')->find($studentId) ?? Student::first();
 

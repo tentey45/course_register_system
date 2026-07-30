@@ -28,6 +28,10 @@ class GoogleAuthController extends Controller
             ->first();
 
         if ($student) {
+            if (!$student->is_active) {
+                return redirect()->route('login')->with('error', 'This student account is inactive. Please contact the registrar.');
+            }
+
             if (!$student->google_id) {
                 $student->update([
                     'google_id' => $googleUser->getId(),
@@ -50,6 +54,21 @@ class GoogleAuthController extends Controller
         ]);
 
         return redirect()->route('register.complete');
+        try {
+
+        $googleUser = Socialite::driver('google')
+            ->stateless()
+            ->user();
+
+
+        dd($googleUser);
+
+
+    } catch (\Exception $e) {
+
+        dd($e->getMessage());
+
+    }
     }
 
     public function showCompleteForm(Request $request): View|RedirectResponse

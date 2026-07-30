@@ -1,4 +1,4 @@
-# Smart Course Registration System (SCRS)
+# Course Register System (CRS)
 
 ## Developers
 - **Ponhvorntey Choub** (Project Lead)
@@ -7,28 +7,35 @@
 ---
 
 ## Project Description
-The **Smart Course Registration System (SCRS)** is a web application designed for university students to manage their course enrollments seamlessly. 
+The **Course Register System (CRS)** is a web application designed for university students to manage their course enrollments seamlessly.
 
 Students can:
-- Login to their account
-- View available courses
-- Search for courses
-- Register for courses
-- Drop enrolled courses
-- View their registered courses
+- Authenticate via password or **Google OAuth**
+- View and search available courses
+- Register for courses and make tuition payments via **ABA PayWay**
+- View enrolled courses and class schedules
+- Manage their profile and upload a custom profile picture
+- Cancel pending registrations
+
+Admins can:
+- Manage academic courses, departments, and schedules
+- View student rosters and course enrollments
+- Monitor all online tuition payment transactions
 
 ---
 
 ## Project Scope
-The project scope is intentionally kept small and targeted as it is developed for a university **Software Engineering** course requirement.
+The project scope is focused on student course registration and online payment management as a university **Software Engineering** capstone project.
 
 ---
 
 ## Features
-- **Authentication**: Student login
-- **Course Exploration**: View Course List, Search Courses
-- **Registration Management**: Register Courses, Drop Courses
-- **Dashboard & Enrollment**: View Registered Courses, Student Profile
+- **Authentication**: Student login & Google OAuth Single Sign-On
+- **Course Exploration**: Browse Course Catalog, View Details & Class Schedules
+- **Online Payment**: ABA PayWay integration with automatic transaction status verification
+- **Registration Management**: Course Registration, Pending Registration Cancellation & Status Checking
+- **Student Profile**: Manage personal details and upload custom profile image
+- **Admin Dashboard**: Course management, registration audit, and payment transaction monitoring
 
 ---
 
@@ -36,19 +43,23 @@ The project scope is intentionally kept small and targeted as it is developed fo
 - **Framework**: Laravel 12
 - **Language**: PHP 8.3+
 - **Database**: MySQL
-- **Frontend**: Blade
-- **CSS**: Bootstrap 5
+- **Frontend**: Blade Templating & Bootstrap 5
+- **Payment Gateway**: ABA PayWay (Payment Link & API Verification)
+- **Authentication**: Native Auth & Google Socialite
 
 ---
 
-## Database Tables Overview
+## Domain Database Tables Overview
 - `departments`
+- `semesters`
 - `students`
 - `admins`
-- `semesters`
 - `courses`
 - `course_schedules`
 - `registrations`
+- `payments`
+
+*For full ERD diagram and table schema details, see [`docs/DATABASE.md`](file:///c:/Users/kfumi/OneDrive/Desktop/course_register_system/docs/DATABASE.md).*
 
 ---
 
@@ -60,73 +71,29 @@ course_register_system/
 │   │   ├── Controllers/
 │   │   ├── Middleware/
 │   │   └── Requests/
-│   └── Models/
+│   ├── Models/
+│   └── Services/
 ├── database/
 │   ├── factories/
 │   ├── migrations/
 │   └── seeders/
 ├── docs/
+│   ├── DATABASE.md
 │   ├── API.md
-│   ├── ERD.png
-│   └── README_PROJECT.md
+│   └── ERD.png
 ├── public/
 ├── resources/
 │   └── views/
-│       ├── auth/
-│       │   └── login.blade.php
-│       ├── course/
-│       │   ├── index.blade.php
-│       │   └── show.blade.php
-│       ├── dashboard/
-│       │   └── index.blade.php
-│       ├── layouts/
-│       │   └── app.blade.php
-│       ├── registration/
-│       │   └── my-course.blade.php
-│       └── student/
-│           └── profile.blade.php
+│       ├── admin/
+│       │   ├── courses/
+│       │   └── payments/
+│       ├── student/
+│       │   ├── courses/
+│       │   ├── payment/
+│       │   └── profile.blade.php
+│       └── layouts/
+│           └── app.blade.php
 ├── routes/
-│   ├── auth.php
 │   └── web.php
-├── storage/
-├── tests/
 └── README.md
-```
-
----
-
-## Git Branching Strategy & Conventions
-Recommended branching strategy for project development:
-
-- `main` — Production/stable releases
-- `develop` — Active integration branch
-- `feature/login` — Student authentication feature development
-- `feature/course-list` — Course listing and search feature
-- `feature/course-registration` — Course registration & drop workflows
-- `feature/student-dashboard` — Dashboard and profile UI
-- `feature/database` — Database schema & migrations implementation
-
----
-
-## Installation (Placeholder)
-
-> [!NOTE]
-> This repository is currently in the initial project setup phase. Setup and installation instructions will be added as features and dependencies are introduced.
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/tentey45/course_register_system.git
-
-# 2. Navigate to project folder
-cd course_register_system
-
-# 3. Install composer dependencies (Future step)
-# composer install
-
-# 4. Environment setup (Future step)
-# cp .env.example .env
-# php artisan key:generate
-
-# 5. Database migrations (Future step)
-# php artisan migrate
 ```
