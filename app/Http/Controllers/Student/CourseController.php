@@ -103,33 +103,11 @@ class CourseController extends Controller
 
     public function register(RegisterCourseRequest $request, string $course): RedirectResponse
     {
-        $studentId = $request->session()->get('user_id');
-
         $courseModel = Course::where('course_code', $course)
             ->orWhere('id', $course)
             ->firstOrFail();
 
-        $existing = Registration::where('student_id', $studentId)
-            ->where('course_id', $courseModel->id)
-            ->first();
-
-        if ($existing) {
-            if ($existing->status === 'registered') {
-                return redirect()->route('student.courses.show', $courseModel->course_code)
-                    ->with('error', 'You are already registered for this course.');
-            }
-            $existing->update(['status' => 'registered', 'registered_at' => now()]);
-        } else {
-            Registration::create([
-                'student_id' => $studentId,
-                'course_id' => $courseModel->id,
-                'registered_at' => now(),
-                'status' => 'registered',
-            ]);
-        }
-
-        return redirect()->route('student.courses.my-courses')
-            ->with('success', "Successfully registered for {$courseModel->course_code} - {$courseModel->title}!");
+        return redirect()->route('student.payment.pay', $courseModel->course_code);
     }
 
     public function myCourses(Request $request): View

@@ -25,6 +25,13 @@ class Registration extends Model
         'drop_reason',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'registered_at' => 'datetime',
+        ];
+    }
+
     public function student(): BelongsTo
     {
         return $this->belongsTo(Student::class);

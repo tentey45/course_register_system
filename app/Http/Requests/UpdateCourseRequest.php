@@ -14,10 +14,13 @@ class UpdateCourseRequest extends FormRequest
 
     public function rules(): array
     {
+        $courseParam = $this->route('course');
+        $courseId = $courseParam instanceof \App\Models\Course ? $courseParam->id : $courseParam;
+
         return [
             'course_code' => [
                 'required', 'string', 'max:20',
-                Rule::unique('courses', 'course_code')->ignore($this->route('course')),
+                Rule::unique('courses', 'course_code')->ignore($courseId),
             ],
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],

@@ -10,61 +10,25 @@ class PaymentController extends Controller
 
     public function callback(Request $request)
     {
-
-        $data = $request->all();
-
-
-        // Get transaction ID
         $tran_id = $request->input('tran_id');
 
-if(!$tran_id){
-    return response()->json([
-        "message"=>"Missing transaction ID"
-    ],400);
-}
-
-
-        // Find student registration
-        $registration = Registration::where(
-            'transaction_id',
-            $tran_id
-        )->first();
-
-
-
-        if(!$registration){
-            return response()->json([
-                "message"=>"Registration not found"
-            ],404);
+        if (!$tran_id) {
+            return response()->json(["message" => "Missing transaction ID"], 400);
         }
 
+        $payment = \App\Models\Payment::where('transaction_id', $tran_id)->first();
 
-
-        /*
-        status:
-        0 = success
-        other = failed
-        */
-
-        if($data['status']=="0"){
-
-            $registration->update([
-                'payment_status'=>'paid'
-            ]);
-
-        }else{
-
-            $registration->update([
-                'payment_status'=>'failed'
-            ]);
-
+        if (!$payment) {
+            return response()->json(["message" => "Payment record not found"], 404);
         }
 
+        if ($request->input('status') == "0") {
+            $payment->update(['status' => \App\Models\Payment::STATUS_PAID]);
+        } else {
+            $payment->update(['status' => \App\Models\Payment::STATUS_FAILED]);
+        }
 
-
-        return response()->json([
-            "message"=>"received"
-        ]);
+        return response()->json(["message" => "received"]);
     }
     public function checkout($registrationId)
 {
